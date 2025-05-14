@@ -5,3 +5,4 @@ langchain_ollama-0.3.2
 langchain_community-0.3.23
 streamlit-1.45.0
 pytube-15.0.0
+youtube-transcript-api==1.0.3

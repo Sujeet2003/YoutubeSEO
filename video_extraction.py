@@ -1,6 +1,6 @@
 import re, requests, json
 from html import unescape
-
+from langchain_community.document_loaders import YoutubeLoader
 
 class VideoExtraction:
     def __init__(self):
@@ -27,7 +27,7 @@ class VideoExtraction:
             
             pattern = r'(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|embed/|v/|shorts/|.*[?&]v=)|youtu\.be/)([a-zA-Z0-9_-]{11})'
             video_id = re.findall(pattern, url)
-            return video_id[0]
+            return video_id[0] if video_id else None
         return None
     
     def get_meta_data(self, video_id) -> dict:
@@ -43,6 +43,7 @@ class VideoExtraction:
             "views": 0,
             "author": "Unknown",
             "video_id": video_id,
+            "transcript": ""
         }
 
         try:
@@ -69,7 +70,7 @@ class VideoExtraction:
 
             player_response = json.loads(match.group(1))
             video_details = player_response.get("videoDetails", {})
-            microformat = player_response.get("microformat", {}).get("playerMicroformatRenderer", {})
+            # microformat = player_response.get("microformat", {}).get("playerMicroformatRenderer", {})
 
             meta_data["title"] = video_details.get("title", meta_data["title"])
             meta_data["author"] = video_details.get("author", meta_data["author"])
@@ -87,18 +88,26 @@ class VideoExtraction:
             if thumbnails:
                 meta_data["thumbnail_url"] = thumbnails[-1]["url"].split("?")[0]  # remove query params
 
+            
+            transcript_loader = YoutubeLoader.from_youtube_url(youtube_url=url, language=['en', 'hi'])
+            documents = transcript_loader.load()
+            meta_data['transcript'] = documents[0].page_content if documents[0].page_content else "Transcript not available"
+
             return meta_data
 
         except Exception as e:
             raise Exception(e)
 
 v = VideoExtraction()
-url = "www.youtube.com/watch?v=bR7mQgwQ_o8&list=PLgUwDviBIf0rENwdL0nEH0uGom9no0nyB&index=19"
+url = "www.youtube.com/watch?v=bR7mQgwQ_o&list=PLgUwDviBIf0rENwdL0nEH0uGom9no0nyB&index=19"
 
 platform = v.get_platform(url=url)
 if platform:
     video_id = v.get_video_id(url=url)
-    meta_data = v.get_meta_data(video_id=video_id)
-    print(meta_data)
+    if video_id is not None:
+        meta_data = v.get_meta_data(video_id=video_id)
+        print(meta_data)
+    else:
+        print("Video Id is not valid, try again with correct youtube URL!")
 else:
     print(f"Oops, seems like you have given url of other platform, please provide Youtube URL!")
