@@ -36,7 +36,7 @@ class VideoExtraction:
         """
         meta_data = {
             "title": f"Youtube Video: {video_id}",
-            "paltform": "Youtube",
+            "platform": "Youtube",
             "description": "",
             "thumbnail_url": f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
             "duration": 300,
@@ -91,23 +91,23 @@ class VideoExtraction:
             
             transcript_loader = YoutubeLoader.from_youtube_url(youtube_url=url, language=['en', 'hi'])
             documents = transcript_loader.load()
-            meta_data['transcript'] = documents[0].page_content if documents[0].page_content else "Transcript not available"
+            meta_data['transcript'] = documents[0].page_content if documents else "Transcript not available"
 
             return meta_data
 
         except Exception as e:
             raise Exception(e)
 
-v = VideoExtraction()
-url = "www.youtube.com/watch?v=bR7mQgwQ_o&list=PLgUwDviBIf0rENwdL0nEH0uGom9no0nyB&index=19"
+# v = VideoExtraction()
+# url = "www.youtube.com/watch?v=bR7mQgwQ_o&list=PLgUwDviBIf0rENwdL0nEH0uGom9no0nyB&index=19"
 
-platform = v.get_platform(url=url)
-if platform:
-    video_id = v.get_video_id(url=url)
-    if video_id is not None:
-        meta_data = v.get_meta_data(video_id=video_id)
-        print(meta_data)
-    else:
-        print("Video Id is not valid, try again with correct youtube URL!")
-else:
-    print(f"Oops, seems like you have given url of other platform, please provide Youtube URL!")
+# platform = v.get_platform(url=url)
+# if platform:
+#     video_id = v.get_video_id(url=url)
+#     if video_id is not None:
+#         meta_data = v.get_meta_data(video_id=video_id)
+#         print(meta_data)
+#     else:
+#         print("Video Id is not valid, try again with correct youtube URL!")
+# else:
+#     print(f"Oops, seems like you have given url of other platform, please provide Youtube URL!")
