@@ -2,6 +2,7 @@ from langchain.prompts import PromptTemplate
 from langchain_ollama import ChatOllama
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 import streamlit as st
+# from video_extraction import VideoExtraction
 
 @st.cache_resource
 def get_ollama_model():
@@ -11,7 +12,7 @@ class Analysis:
     def __init__(self, ollama_llm):
         self.__ollama_llm = ollama_llm
 
-    def seo_response_schema(self):
+    def __seo_response_schema(self):
         """
             Create a Structured Output for SEO Recommendations.
         """
@@ -55,7 +56,7 @@ class Analysis:
         analysis_chain = tempelate1 | self.__ollama_llm
         analysis_response = analysis_chain.invoke({'platform': platform, 'video_url': video_url, 'title': title, 'transcript': transcript, 'language': language})
 
-        parser = self.seo_response_schema()
+        parser = self.__seo_response_schema()
         format_instructions = parser.get_format_instructions()
 
         template2 = PromptTemplate(
@@ -120,7 +121,8 @@ class Analysis:
 # else:
 #     print(f"Oops, seems like you have given url of other platform, please provide Youtube URL!")
 
-# analysis = Analysis()
+# ollama_model = get_ollama_model()
+# analysis = Analysis(ollama_llm=ollama_model)
 # if meta_data:
 #     result = analysis.seo_analysis(url, meta_data)
 #     for key, value in result.items():

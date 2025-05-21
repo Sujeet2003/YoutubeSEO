@@ -5,74 +5,43 @@ import os
 
 
 
-LANGUAGES = ['English', 'Hindi', 'French', 'German', 'Spanish', 'Japanese', 'Russian', 'Arabic', 'Korean']
+LANGUAGES = ['English', 'Hindi']
 
 st.set_page_config(page_title="Youtube Video SEO Optimizer", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
-    <style>
+    <style> 
+        svg {
+            display: none;    
+        }
+            
+        .e1lln2w82 {
+            width: none;    
+        }
+               
         h1 {
             text-align: center; 
         }
         
-        # centered to the sidebar image
+        /* Sidebar image section centered */
         .e1q5ojhd0 {
             display: flex;
             justify-content: center;    
         }
         
-        selectbox {
-            cursor: pointer;    
+        /* Youtube URL submit button setup */
+        .st-emotion-cache-ovf5rk {
+            width: 200px;    
+        }
+            
+        /* Youtube Icon for platform */
+        .platform {
+            background: red;
+            width: 130px;
+            text-align: center;
+            border-radius: 10px;    
         }
         
-        # Input URL Submit button
-        div.stButton > button:first-child {
-            background-color: #ff4b4b;
-            color: white;
-            padding: 0.75em 2em;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        div.stButton > button:first-child:hover {
-            background-color: #e63e3e;
-        }
-#         .main-title {
-#             font-size: 2.5rem;
-#             color: #1E88E5;
-#             margin-bottom: 1rem;    
-#         }
-#         .section-title {
-#             font-size: 1.5rem;
-#             color: #0D47A1;
-#             margin-top: 1rem;    
-#         }
-#         .tag-pill {
-#             background-color: #E3F2FD;
-#             color: #1565C0;
-#             padding: 5px 10px;
-#             border-radius: 15px;
-#             margin: 2px;
-#             display: inline-block;    
-#         }
-#         .timestamp-card {
-#             background-color: #2196F3;
-#             padding: 10px;
-#             border-radius: 5px;
-#             margin-bottom: 5px;
-#             color: #FFFFFF;  
-#         }
-#         .timestamp-card b {
-#             color: #FF5252;
-#             font-weight: bold;    
-#         }
-#         .stButton>button {
-#             background-color: #1E88E5;
-#             color: white;    
-#         }
     </style>
 """, unsafe_allow_html=True)
 
@@ -90,10 +59,10 @@ with st.sidebar:
     selected_language = st.selectbox("Select Language", LANGUAGES, index=0)
 
     st.subheader("Model Settings")
-    model_options = st.selectbox(
+    selected_model = st.selectbox(
         "Select AI Engine",
-        ['OpenAI GPT-4', 'HuggingFace Model', 'Local Model'],
-        index=2,
+        ['Local Model', 'HuggingFace Model'],
+        index=1,
         help="Select any model with after entering appropriate API Key"   
     )
 
@@ -127,38 +96,86 @@ if 'meta_data' not in st.session_state:
 if 'video_url' not in st.session_state:
     st.session_state.video_url = None
 
-if submit_button:
-    if video_url:
-        st.session_state.video_url = video_url
-        try:
-            video_extraction = VideoExtraction()
-            ollama_model = get_ollama_model()
-            analysis = Analysis(ollama_llm=ollama_model)
-            with st.spinner("Fetching video information..."):
-                platform = video_extraction.get_platform(url=video_url)
-                if platform:
-                    video_id = video_extraction.get_video_id(url=video_url)
-                    if video_id:
-                        meta_data = video_extraction.get_meta_data(video_id=video_id)
-                        if meta_data:
-                            st.session_state.meta_data = meta_data
-                        else:
-                            st.warning("Could not extract video metadata.")
-                    else:
-                        st.warning("Oops, invalid Video ID. Try again!")
-                else:
-                    st.warning("Oops, invalid platform URL. Please use a YouTube URL.")
+tab1, tab2 = st.tabs(['Video Info', 'SEO Recommendations'])
 
-            
-            col1, col2 = st.columns([2, 1])
-            with col1:
-                st.subheader("Video Details")
+with tab1:
+    if submit_button:
+        if video_url:
+            st.session_state.video_url = video_url
+            try:
+                video_extraction = VideoExtraction()
+                with st.spinner("Fetching video information..."):
+                    platform = video_extraction.get_platform(url=video_url)
+                    if platform:
+                        video_id = video_extraction.get_video_id(url=video_url)
+                        if video_id:
+                            meta_data = video_extraction.get_meta_data(video_id=video_id)
+                            if meta_data:
+                                st.session_state.meta_data = meta_data
+                            else:
+                                st.warning("Could not extract video metadata.")
+                        else:
+                            st.warning("Oops, invalid Video ID. Try again!")
+                    else:
+                        st.warning("Oops, invalid platform URL. Please use a YouTube URL.")
+
+                st.subheader("Video Informations")
                 if st.session_state.meta_data:
                     platform = st.session_state.meta_data.get('platform', 'Unknown')
                     title = st.session_state.meta_data['title']
-                    st.markdown(platform)
-                    st.markdown(title)
-                # else:
-                #     st.warning("Video metadata could not be retrieved.")
-        except:
-            raise
+                    description = st.session_state.meta_data.get('description')
+                    duration = st.session_state.meta_data.get('duration') // 60
+                    views = st.session_state.meta_data.get('views')
+                    author = st.session_state.meta_data.get('author')
+                    transcript = st.session_state.meta_data.get('transcript', "")
+                    thumbnail_url = st.session_state.meta_data.get('thumbnail_url')
+
+                    st.write(f"""<h4 class="platform">{platform}</h4>""", unsafe_allow_html=True)
+
+                    st.write(f"""<p style="margin: 10px 0; font-size: 20px;"><strong>Title:</strong> <br> {title}</p>""", unsafe_allow_html=True)
+
+                    st.write(f"""<p style="margin: 10px 0; font-size: 20px;"><strong>Creator: </strong> {author}</p>""", unsafe_allow_html=True)
+
+                    st.write(f"""<p style="margin: 10px 0; font-size: 20px;"><strong>Duration: </strong> {duration} minute(s)</p>""", unsafe_allow_html=True)
+
+                    st.write(f"""<p style="margin: 10px 0; font-size: 20px;"><strong>Views: </strong> {views}</p>""", unsafe_allow_html=True)
+
+                    st.write(f"""<p style="margin: 10px 0; font-size: 20px;"><strong>Description:</strong> <br>  {description}</p>""", unsafe_allow_html=True)
+
+                    # st.write(f"""<p style="margin: 10px 0; font-size: 20px;"><strong>Transcript: </strong><br> <p style="font-size: 16px;">{transcript[:500]}...</p> </p>""", unsafe_allow_html=True)
+
+                    st.markdown(f"""
+                    <p style="margin: 10px 0; font-size: 20px;"><strong>Transcript:</strong></p>
+                    <p style="font-size: 16px;">{transcript[:500]}...</p>
+                    """, unsafe_allow_html=True)
+
+                    with st.expander("Read more"):
+                        st.markdown(f"<p style='font-size: 16px;'>{transcript}</p>", unsafe_allow_html=True)
+                    
+                    st.image(thumbnail_url, width=600)
+                else:
+                    st.warning("Video metadata could not be retrieved.")
+                                
+            except:
+                st.warning(f"Oops, some error occurred, try again...")
+
+with tab2:
+    st.header("SEO Recommendations")
+    if st.session_state.meta_data:
+        if st.button("Generate SEO Recommendations"):
+            with st.spinner("Analyzing video and generating recommendations..."):
+                try:
+                    ollama_model = get_ollama_model()
+                    analysis = Analysis(ollama_llm=ollama_model)
+                    result = analysis.seo_analysis(video_url=st.session_state.video_url, meta_data=st.session_state.meta_data, language=selected_language)
+                    st.session_state.analysis_result = result
+                    st.session_state.analysis_complete = True
+                except Exception as e:
+                    st.error(f"Error generating recommendations: {e}")
+
+    else:
+        st.info("Please enter a valid video URL in the 'Video Info' tab first.")
+
+    if st.session_state.analysis_complete and st.session_state.analysis_result:
+        st.subheader("SEO Suggestions")
+        st.write(st.session_state.analysis_result)

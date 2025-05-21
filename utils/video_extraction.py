@@ -81,7 +81,7 @@ class VideoExtraction:
             raw_description = unescape(video_details.get("shortDescription", ""))
             lines = raw_description.strip().split("\n")
             filtered_lines = [line for line in lines if not line.lower().startswith("http")]
-            meta_data["description"] = "\n".join(filtered_lines[:5])[:500].strip()
+            meta_data["description"] = "\n".join(filtered_lines).strip()
 
             # Try high-quality thumbnail fallback
             thumbnails = video_details.get("thumbnail", {}).get("thumbnails", [])
@@ -99,7 +99,7 @@ class VideoExtraction:
             raise Exception(e)
 
 # v = VideoExtraction()
-# url = "www.youtube.com/watch?v=bR7mQgwQ_o&list=PLgUwDviBIf0rENwdL0nEH0uGom9no0nyB&index=19"
+# url = "https://www.youtube.com/watch?v=ZTmF2v59CtI"
 
 # platform = v.get_platform(url=url)
 # if platform:
