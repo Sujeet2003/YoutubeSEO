@@ -68,28 +68,7 @@ class Analysis:
                 {analysis}
 
                 Generate comprehensive SEO recommendations specially for {platform} including:
-                1. 5-7 alternative titles suggesations ranked by SEO potential each under 60 characters for youtube appropriate length for {platform}
-                2. Exactly 35 trending tags/hashtags related to video content, ranked by potential traffic and relevance. For {platform}, optimize the tags according to platform best practices. Few Examples of tags and hashtags are as:
-                'tags': {{
-                    0: "Pink Lips Song"
-                    1: "Sunny Leone"
-                    2: "Meet Bros Anjjan"
-                    3: "Khushboo Grewal"
-                    4: "Hate Story 2"
-                    5: "Bollywood music video"
-                    6: "love song"
-                    7: "romantic song"
-                    8: "dance"
-                }}
-                3. Detailed and SEO-Optimized video description (400-500 words) that includes:
-                    - An engaging hook in the first 2-3 sentences that entices viewers
-                    - A clear value proposition explaining what viewer will gain
-                    - Key topics covered with strategic keywords placement
-                    - A strong call-to-action appropriate for {platform}
-                    - Proper formatting with paragraph breaks for readability
-                4. Exactly {num_of_timestamps} timestamps with descriptive labels evenly distributed throughout the video (duration: {duration} seconds)
-
-                The output should be structured in JSON as example:
+                1. 5-7 alternative titles suggesations ranked by SEO potential each under 60 characters for youtube appropriate length for {platform}. The output should be structured in JSON like:
                 'title': {{
                     Atleast 5 List of titles like:
                     0:{{
@@ -112,10 +91,9 @@ class Analysis:
                         "rank":5
                         "title":"Pink Lips Song: Love, Longing & Romance"
                     }}
-                }},
-
+                }}
+                2. Exactly 35 trending tags/hashtags related to video content, ranked by potential traffic and relevance. For {platform}, optimize the tags according to platform best practices. Few Examples of tags and hashtags are as:
                 'tags': {{
-                    List of atleast 35 tags/hashtags like:
                     0: "Pink Lips Song"
                     1: "Sunny Leone"
                     2: "Meet Bros Anjjan"
@@ -125,10 +103,14 @@ class Analysis:
                     6: "love song"
                     7: "romantic song"
                     8: "dance"
-                }},
-                'description': {{
-                    Description for this video
-                }},
+                }}
+                3. Detailed and SEO-Optimized video description (400-500 words) that includes:
+                    - An engaging hook in the first 2-3 sentences that entices viewers
+                    - A clear value proposition explaining what viewer will gain
+                    - Key topics covered with strategic keywords placement
+                    - A strong call-to-action appropriate for {platform}
+                    - Proper formatting with paragraph breaks for readability
+                4. Exactly {num_of_timestamps} timestamps with descriptive labels evenly distributed throughout the video (duration: {duration} seconds). The output should look like:
                 'timestamp': {{
                     Give atleast 5 timestamp which should be like:
                     0:{{
