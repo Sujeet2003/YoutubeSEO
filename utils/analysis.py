@@ -69,7 +69,18 @@ class Analysis:
 
                 Generate comprehensive SEO recommendations specially for {platform} including:
                 1. 5-7 alternative titles suggesations ranked by SEO potential each under 60 characters for youtube appropriate length for {platform}
-                2. Exactly 35 trending tags/hashtags related to video content, ranked by potential traffic and relevance. For {platform}, optimize the tags according to platform best practices.
+                2. Exactly 35 trending tags/hashtags related to video content, ranked by potential traffic and relevance. For {platform}, optimize the tags according to platform best practices. Few Examples of tags and hashtags are as:
+                'tags': {{
+                    0: "Pink Lips Song"
+                    1: "Sunny Leone"
+                    2: "Meet Bros Anjjan"
+                    3: "Khushboo Grewal"
+                    4: "Hate Story 2"
+                    5: "Bollywood music video"
+                    6: "love song"
+                    7: "romantic song"
+                    8: "dance"
+                }}
                 3. Detailed and SEO-Optimized video description (400-500 words) that includes:
                     - An engaging hook in the first 2-3 sentences that entices viewers
                     - A clear value proposition explaining what viewer will gain
@@ -78,20 +89,64 @@ class Analysis:
                     - Proper formatting with paragraph breaks for readability
                 4. Exactly {num_of_timestamps} timestamps with descriptive labels evenly distributed throughout the video (duration: {duration} seconds)
 
-                The output should be shtructured in JSON as example:
+                The output should be structured in JSON as example:
                 'title': {{
-                    List of titles
+                    Atleast 5 List of titles like:
+                    0:{{
+                        "rank":1
+                        "title":"Pink Lips Full Video Song | Sunny Leone | Hate Story 2 | Meet Bros Anjjan Feat Khushboo Grewal"
+                    }}
+                    1:{{
+                        "rank":2
+                        "title":"Sunny Leone's Sensual Dance in Pink Lips"
+                    }}
+                    2:{{
+                        "rank":3
+                        "title":"Hate Story 2 Soundtrack: Pink Lips Full Video Song"
+                    }}
+                    3:{{
+                        "rank":4
+                        "title":"Meet Bros Anjjan & Sunny Leone Collaboration - Pink Lips"
+                    }}
+                    4:{{
+                        "rank":5
+                        "title":"Pink Lips Song: Love, Longing & Romance"
+                    }}
                 }},
+
                 'tags': {{
-                    List of 35 tags/hashtags
+                    List of atleast 35 tags/hashtags like:
+                    0: "Pink Lips Song"
+                    1: "Sunny Leone"
+                    2: "Meet Bros Anjjan"
+                    3: "Khushboo Grewal"
+                    4: "Hate Story 2"
+                    5: "Bollywood music video"
+                    6: "love song"
+                    7: "romantic song"
+                    8: "dance"
                 }},
                 'description': {{
                     Description for this video
                 }},
                 'timestamp': {{
-                    Timestamp should be like:
-                    00:48: introduction
-                    49:120: main content
+                    Give atleast 5 timestamp which should be like:
+                    0:{{
+                        "time":"00:00"
+                        "description":"Introduction of the song and its performers"
+                    }}
+                    1:{{
+                        "time":"02:19"
+                        "description":"Main content of the music video with Sunny Leone's dance performance"
+                    }}
+                    2:{{
+                        "time":"05:20"
+                        "description":"Lyrics and storytelling in the song"
+                    }}
+                    3:{{
+                        "time":"08:42"
+                        "description":"Climax of the song and its performers"
+                    }}
                 }}
 
                 {format_instructions}
