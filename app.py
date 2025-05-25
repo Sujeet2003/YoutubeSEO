@@ -50,9 +50,9 @@ st.markdown("""
 with st.sidebar:
     st.image("images/image-1.jpeg")
     st.title("API Configuration")
-    openai_api_key = st.text_input("Open API Key", type="password", key="openai key")
-    if openai_api_key:
-        os.environ['OPENAI_API_KEY'] = openai_api_key
+    huggingface_api_key = st.text_input("HuggingFace API Key", type="password", key="Hugging Face API ")
+    if huggingface_api_key:
+        os.environ['HUGGING_FACE_TOKEN'] = huggingface_api_key
     
     st.divider()
     st.subheader("Language Settings")
