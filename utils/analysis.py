@@ -32,8 +32,8 @@ class Analysis:
         title = meta_data.get('title', '')
         transcript = meta_data.get('transcript', '')
         duration = meta_data.get('duration', 0)
-        minutes = duration // 60
-        num_of_timestamps = min(15, max(5, minutes // 2)) if minutes > 0 else 5
+        duration_in_minutes = duration // 60
+        num_of_timestamps = max(6, min(duration_in_minutes // 5, 60))
         
         template1 = PromptTemplate(
             template="""
@@ -81,131 +81,106 @@ class Analysis:
 
         # template2 = PromptTemplate(
         #     template="""
-        #         You are an SEO specialist focusing on optimizing {platform} content for maximum discovery and engagement.
+        #     You are an SEO specialist focusing on optimizing {platform} content for maximum discovery and engagement.
 
-        #         Based on the analysis of a {platform} video titles '{title}': 
+        #     Based on the analysis of a {platform} video titled "{title}":
 
-        #         {analysis}
+        #     {analysis}
 
-        #         Generate comprehensive SEO recommendations specially for {platform} including:
-        #         1. 5-7 alternative titles suggestions ranked by SEO potential each under 60 characters for youtube appropriate length for {platform}. The output should be structured in JSON like:
-        #         Atleast minimum of 5 List of titles like:
-        #         'title': {{
-        #             0:{{
-        #                 "rank":1
-        #                 "title":"Pink Lips Full Video Song | Sunny Leone | Hate Story 2 | Meet Bros Anjjan Feat Khushboo Grewal"
-        #             }}
-        #             1:{{
-        #                 "rank":2
-        #                 "title":"Sunny Leone's Sensual Dance in Pink Lips"
-        #             }}
-        #             2:{{
-        #                 "rank":3
-        #                 "title":"Hate Story 2 Soundtrack: Pink Lips Full Video Song"
-        #             }}
-        #             3:{{
-        #                 "rank":4
-        #                 "title":"Meet Bros Anjjan & Sunny Leone Collaboration - Pink Lips"
-        #             }}
-        #             4:{{
-        #                 "rank":5
-        #                 "title":"Pink Lips Song: Love, Longing & Romance"
-        #             }}
-        #         }}
-        #         2. Exactly 35 trending tags/hashtags related to video content, ranked by potential traffic and relevance. For {platform}, optimize the tags according to platform best practices. Few Examples of tags and hashtags are as:
-        #         'tags': {{
-        #             0: "Pink Lips Song"
-        #             1: "Sunny Leone"
-        #             2: "Meet Bros Anjjan"
-        #             3: "Khushboo Grewal"
-        #             4: "Hate Story 2"
-        #             5: "Bollywood music video"
-        #             6: "love song"
-        #             7: "romantic song"
-        #             8: "dance"
-        #         }}
-        #         3. Detailed and SEO-Optimized video description (400-500 words) that includes:
-        #             - An engaging hook in the first 2-3 sentences that entices viewers
-        #             - A clear value proposition explaining what viewer will gain
-        #             - Key topics covered with strategic keywords placement
-        #             - A strong call-to-action appropriate for {platform}
-        #             - Proper formatting with paragraph breaks for readability
-        #         4. Exactly {num_of_timestamps} timestamps with descriptive labels evenly distributed throughout the video (duration: {duration} seconds). The output should look like:
-        #         Give atleast 5 timestamp as minimum number (maximum you can go as much you want after analysing the full transcript from where you can give more timestamps) which should be like:
-        #         'timestamp': {{
-        #             0:{{
-        #                 "time":"00:00"
-        #                 "description":"Introduction of the song and its performers"
-        #             }}
-        #             1:{{
-        #                 "time":"02:19"
-        #                 "description":"Main content of the music video with Sunny Leone's dance performance"
-        #             }}
-        #             2:{{
-        #                 "time":"05:20"
-        #                 "description":"Lyrics and storytelling in the song"
-        #             }}
-        #             3:{{
-        #                 "time":"08:42"
-        #                 "description":"Climax of the song and its performers"
-        #             }}
-        #         }}
+        #     Generate comprehensive SEO recommendations specifically for {platform} including:
 
-        #         {format_instructions}
+        #     1. 5-7 alternative title suggestions ranked by SEO potential, each under 60 characters. Output format:
+        #     "title": {{
+        #         "0": {{"rank": 1, "title": "Alternative title 1"}},
+        #         "1": {{"rank": 2, "title": "Alternative title 2"}},
+        #         "2": {{"rank": 3, "title": "Alternative title 3"}}
+        #     }}
 
-        #         All content should be in {language} language.
-        #     """, input_variables=['platform', 'title', 'analysis', 'num_of_timestamps', 'duration', 'language'],
-        #     partial_variables={'format_instructions': format_instructions}
+        #     2. Exactly 35 trending tags or hashtags. Output format:
+        #     "tags": {{
+        #         "0": "tag1",
+        #         "1": "tag2",
+        #         "2": "tag3"
+        #     }}
+
+        #     3. A detailed and SEO-Optimized video description (500-1000 words) with:
+        #         - A hook in the first 2-3 sentences
+        #         - Value proposition
+        #         - Key topics with keywords
+        #         - Clear call-to-action
+        #         - Paragraphs for readability
+
+        #     4. Exactly {num_of_timestamps} timestamps, evenly distributed (duration: {duration} seconds). Output format:
+        #     "timestamp": {{
+        #         "0": {{"time": "00:00", "description": "Intro"}},
+        #         "1": {{"time": "02:30", "description": "Key topic"}},
+        #         "2": {{"time": "05:00", "description": "Outro"}}
+        #     }}
+
+        #     {format_instructions}
+
+        #     Respond ONLY in VALID JSON.
+        #     All content must be in {language}.
+        #     """,
+        #         input_variables=['platform', 'title', 'analysis', 'num_of_timestamps', 'duration', 'language'],
+        #         partial_variables={'format_instructions': format_instructions}
         # )
-
         template2 = PromptTemplate(
             template="""
-            You are an SEO specialist focusing on optimizing {platform} content for maximum discovery and engagement.
+                You are an SEO specialist focusing on optimizing {platform} content for maximum discovery and engagement.
 
-            Based on the analysis of a {platform} video titled "{title}":
+                Based on the detailed transcript analysis of a {platform} video titled "{title}", lasting approximately {duration} seconds:
 
-            {analysis}
+                {analysis}
 
-            Generate comprehensive SEO recommendations specifically for {platform} including:
+                Generate comprehensive SEO recommendations specifically for {platform} including:
 
-            1. 5-7 alternative title suggestions ranked by SEO potential, each under 60 characters. Output format:
-            "title": {{
-                "0": {{"rank": 1, "title": "Alternative title 1"}},
-                "1": {{"rank": 2, "title": "Alternative title 2"}},
-                "2": {{"rank": 3, "title": "Alternative title 3"}}
-            }}
+                1. 7 alternative title suggestions ranked by SEO potential, each under 60 characters. Titles must be catchy, keyword-optimized, and diverse. 
+                Output format:
+                "title": {{
+                    "0": {{"rank": 1, "title": "Alternative title 1"}},
+                    "1": {{"rank": 2, "title": "Alternative title 2"}},
+                    "2": {{"rank": 3, "title": "Alternative title 3"}},
+                    "3": {{"rank": 4, "title": "Alternative title 4"}},
+                    "4": {{"rank": 5, "title": "Alternative title 5"}},
+                    "5": {{"rank": 6, "title": "Alternative title 6"}},
+                    "6": {{"rank": 7, "title": "Alternative title 7"}}
+                }}
 
-            2. Exactly 35 trending tags or hashtags. Output format:
-            "tags": {{
-                "0": "tag1",
-                "1": "tag2",
-                "2": "tag3"
-            }}
+                2. Exactly 35 trending tags or hashtags relevant to the video content.
+                Output format:
+                "tags": {{
+                    "0": "tag1",
+                    "1": "tag2",
+                    "2": "tag3",
+                    ...
+                    "34": "tag35"
+                }}
 
-            3. A detailed and SEO-Optimized video description (500-1000 words) with:
-                - A hook in the first 2-3 sentences
-                - Value proposition
-                - Key topics with keywords
-                - Clear call-to-action
-                - Paragraphs for readability
+                3. A detailed and SEO-Optimized video description (500–1000 words) with:
+                    - A hook in the first 2–3 sentences
+                    - Clear value proposition
+                    - Key discussion points and topics with proper keywords
+                    - A strong call-to-action (CTA)
+                    - Paragraphs for readability
 
-            4. Exactly {num_of_timestamps} timestamps, evenly distributed (duration: {duration} seconds). Output format:
-            "timestamp": {{
-                "0": {{"time": "00:00", "description": "Intro"}},
-                "1": {{"time": "02:30", "description": "Key topic"}},
-                "2": {{"time": "05:00", "description": "Outro"}}
-            }}
+                4. Generate {num_of_timestamps} **evenly distributed and content-aware timestamps** across the full video duration (≈{duration} seconds). Analyze the full transcript to identify major sections, topic shifts, and natural transitions.
+                Output format:
+                "timestamp": {{
+                    "0": {{"time": "00:00", "description": "Intro"}},
+                    "1": {{"time": "HH:MM", "description": "Next Key Topic"}},
+                    ...
+                    "{{last}}": {{"time": "HH:MM", "description": "Conclusion"}}
+                }}
 
-            {format_instructions}
+                {format_instructions}
 
-            Respond ONLY in VALID JSON.
-            All content must be in {language}.
+                Respond ONLY in VALID JSON format.
+                All content must be in {language}.
             """,
-                input_variables=['platform', 'title', 'analysis', 'num_of_timestamps', 'duration', 'language'],
-                partial_variables={'format_instructions': format_instructions}
+            input_variables=['platform', 'title', 'analysis', 'num_of_timestamps', 'duration', 'language'],
+            partial_variables={'format_instructions': format_instructions}
         )
-
-
 
         recommendation_chain = template2 | self.__ollama_llm
         response = recommendation_chain.invoke({'platform': platform, 'title': title, 'analysis': str(analysis_response), 'num_of_timestamps': num_of_timestamps, 'duration': duration, 'language': language})
