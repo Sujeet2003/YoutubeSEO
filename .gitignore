@@ -1,3 +1,4 @@
 others/*
 .env
 dsa.py
+__pycache__/*

@@ -1,16 +1,29 @@
 from utils.video_extraction import VideoExtraction
-from utils.analysis import Analysis, get_ollama_model
+from utils.analysis import Analysis
+from utils.model_handler import get_ollama_model
 import streamlit as st
 import os
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
+from utils.model_handler import HuggingFaceModel
+load_dotenv()
 
 
+api_token = None
+model = None
+is_local_model = False
 
-LANGUAGES = ['English', 'Hindi']
+if "llm" not in st.session_state:
+    st.session_state.llm = None
+
 
 st.set_page_config(page_title="Youtube Video SEO Optimizer", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
     <style> 
+        div[data-baseweb="select"] > div {
+            cursor: pointer;
+        }
         svg {
             display: none;    
         }
@@ -48,16 +61,6 @@ st.markdown("""
 
 # Sidebar
 with st.sidebar:
-    st.image("images/image-1.jpeg")
-    st.title("API Configuration")
-    huggingface_api_key = st.text_input("HuggingFace API Key", type="password", key="Hugging Face API ")
-    if huggingface_api_key:
-        os.environ['HUGGING_FACE_TOKEN'] = huggingface_api_key
-    
-    st.divider()
-    st.subheader("Language Settings")
-    selected_language = st.selectbox("Select Language", LANGUAGES, index=0)
-
     st.subheader("Model Settings")
     selected_model = st.selectbox(
         "Select AI Engine",
@@ -65,6 +68,24 @@ with st.sidebar:
         index=1,
         help="Select any model with after entering appropriate API Key"   
     )
+
+    model = selected_model
+
+    if model != "Local Model":
+        st.title("API Configuration")
+        api_key = st.text_input("API Key", type="password", key="API Key")
+        submit_api_key = st.button("Submit API Key")
+        if submit_api_key:
+            if api_key:
+                os.environ['HUGGING_FACE_TOKEN'] = api_key
+                api_token = api_key
+            else:
+                api_token = os.environ['HUGGING_FACE_TOKEN']
+    
+    st.divider()
+    st.subheader("Language Settings")
+    LANGUAGES = ['English', 'Hindi']
+    selected_language = st.selectbox("Select Language", LANGUAGES, index=0)
 
     st.divider()
     st.subheader("About")
@@ -75,6 +96,14 @@ with st.sidebar:
     st.divider()
     st.caption("Created with GenAI (LLMs), Langchain and Streamlit")
 
+# Invoking the appropriate models
+if model == 'Local Model':
+    st.session_state.llm = get_ollama_model()
+    is_local_model = True
+else:
+    if api_token:
+        client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.3", token=api_token)
+        st.session_state.llm = HuggingFaceModel(client)
 
 # Main Content
 st.title("Youtube SEO Optimizer")
@@ -165,8 +194,8 @@ with tab2:
         if st.button("Generate SEO Recommendations"):
             with st.spinner("Analyzing video and generating recommendations..."):
                 try:
-                    ollama_model = get_ollama_model()
-                    analysis = Analysis(ollama_llm=ollama_model)
+                    # ollama_model = get_ollama_model()
+                    analysis = Analysis(llm=st.session_state.llm, is_local_model=is_local_model)
                     result = analysis.seo_analysis(video_url=st.session_state.video_url, meta_data=st.session_state.meta_data, language=selected_language)
                     st.session_state.analysis_result = result
                     st.session_state.analysis_complete = True

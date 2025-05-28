@@ -1,16 +1,11 @@
 from langchain.prompts import PromptTemplate
-from langchain_ollama import ChatOllama
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
-import streamlit as st
-# from video_extraction import VideoExtraction
 
-@st.cache_resource
-def get_ollama_model():
-    return ChatOllama(model="llava", temperature=0.7)
 
 class Analysis:
-    def __init__(self, ollama_llm):
-        self.__ollama_llm = ollama_llm
+    def __init__(self, llm, is_local_model):
+        self.__llm = llm
+        self.__is_local_model = is_local_model
 
     def __seo_response_schema(self):
         """
@@ -73,58 +68,25 @@ class Analysis:
             input_variables=['platform', 'video_url', 'title', 'transcript', 'language', 'description']
         )
 
-        analysis_chain = template1 | self.__ollama_llm
-        analysis_response = analysis_chain.invoke({'platform': platform, 'video_url': video_url, 'title': title, 'transcript': transcript, 'description': meta_data['description'], 'language': language,})
+        # analysis_chain = template1 | self.__ollama_llm
+        # analysis_response = analysis_chain.invoke({'platform': platform, 'video_url': video_url, 'title': title, 'transcript': transcript, 'description': meta_data['description'], 'language': language,})
+        formatted_prompt1 = template1.format(
+            platform=platform,
+            video_url=video_url,
+            title=title,
+            transcript=transcript,
+            description=meta_data['description'],
+            language=language
+        )
+
+        analysis_response = self.__llm.invoke(formatted_prompt1)
+        if self.__is_local_model:
+            analysis_response = str(analysis_response.content)
+        print(analysis_response)
 
         parser = self.__seo_response_schema()
         format_instructions = parser.get_format_instructions()
 
-        # template2 = PromptTemplate(
-        #     template="""
-        #     You are an SEO specialist focusing on optimizing {platform} content for maximum discovery and engagement.
-
-        #     Based on the analysis of a {platform} video titled "{title}":
-
-        #     {analysis}
-
-        #     Generate comprehensive SEO recommendations specifically for {platform} including:
-
-        #     1. 5-7 alternative title suggestions ranked by SEO potential, each under 60 characters. Output format:
-        #     "title": {{
-        #         "0": {{"rank": 1, "title": "Alternative title 1"}},
-        #         "1": {{"rank": 2, "title": "Alternative title 2"}},
-        #         "2": {{"rank": 3, "title": "Alternative title 3"}}
-        #     }}
-
-        #     2. Exactly 35 trending tags or hashtags. Output format:
-        #     "tags": {{
-        #         "0": "tag1",
-        #         "1": "tag2",
-        #         "2": "tag3"
-        #     }}
-
-        #     3. A detailed and SEO-Optimized video description (500-1000 words) with:
-        #         - A hook in the first 2-3 sentences
-        #         - Value proposition
-        #         - Key topics with keywords
-        #         - Clear call-to-action
-        #         - Paragraphs for readability
-
-        #     4. Exactly {num_of_timestamps} timestamps, evenly distributed (duration: {duration} seconds). Output format:
-        #     "timestamp": {{
-        #         "0": {{"time": "00:00", "description": "Intro"}},
-        #         "1": {{"time": "02:30", "description": "Key topic"}},
-        #         "2": {{"time": "05:00", "description": "Outro"}}
-        #     }}
-
-        #     {format_instructions}
-
-        #     Respond ONLY in VALID JSON.
-        #     All content must be in {language}.
-        #     """,
-        #         input_variables=['platform', 'title', 'analysis', 'num_of_timestamps', 'duration', 'language'],
-        #         partial_variables={'format_instructions': format_instructions}
-        # )
         template2 = PromptTemplate(
             template="""
                 You are an SEO specialist focusing on optimizing {platform} content for maximum discovery and engagement.
@@ -182,13 +144,27 @@ class Analysis:
             partial_variables={'format_instructions': format_instructions}
         )
 
-        recommendation_chain = template2 | self.__ollama_llm
-        response = recommendation_chain.invoke({'platform': platform, 'title': title, 'analysis': str(analysis_response), 'num_of_timestamps': num_of_timestamps, 'duration': duration, 'language': language})
+        # recommendation_chain = template2 | self.__ollama_llm
+        # response = recommendation_chain.invoke({'platform': platform, 'title': title, 'analysis': str(analysis_response), 'num_of_timestamps': num_of_timestamps, 'duration': duration, 'language': language})
+        formatted_prompt2 = template2.format(
+            platform=platform,
+            title=title,
+            analysis=analysis_response,
+            num_of_timestamps=num_of_timestamps,
+            duration=duration,
+            language=language
+        )
+
+        response = self.__llm.invoke(formatted_prompt2)
+        print(response)
 
         try:
-            return parser.parse(response.content)
+            if self.__is_local_model:
+                return parser.parse(response.content)
+            else:
+                return parser.parse(response)
         except Exception as e:
-            print("Raw response:\n", response.content)
+            print("Raw response:\n", response)
             raise ValueError(f"Error parsing response: {e}")
 
 
