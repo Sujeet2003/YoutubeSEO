@@ -20,10 +20,9 @@
 ## 📸 Screenshots
 
 ![Screenshot of YouTube SEO Recommender](images/home.png)
-!(images/home.png)
-!(images/seo-recommend.png)
-!(images/alternative-titles.png)
-!(images/tags.png)
+![Screenshot of YouTube SEO Recommender](images/seo-recommend.png)
+![Screenshot of YouTube SEO Recommender](images/alternative-titles.png)
+![Screenshot of YouTube SEO Recommender](images/tags.png)
 
 ## 🛠️ Installation
 
