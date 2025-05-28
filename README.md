@@ -19,10 +19,10 @@
 
 ## 📸 Screenshots
 
-(images/home.png)
-(images/seo-recommend.png)
-(images/alternative-titles.png)
-(images/tags.png)
+!(images/home.png)
+!(images/seo-recommend.png)
+!(images/alternative-titles.png)
+!(images/tags.png)
 
 ## 🛠️ Installation
 
