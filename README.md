@@ -19,6 +19,7 @@
 
 ## 📸 Screenshots
 
+![Screenshot of YouTube SEO Recommender](images/home.png)
 !(images/home.png)
 !(images/seo-recommend.png)
 !(images/alternative-titles.png)
