@@ -1,6 +1,7 @@
 from langchain_ollama import ChatOllama
 import streamlit as st
 from langchain_core.runnables import Runnable
+from utils.config import LOCAL_MODEL
 
 class HuggingFaceModel(Runnable):
     def __init__(self, client):
@@ -12,4 +13,4 @@ class HuggingFaceModel(Runnable):
 
 @st.cache_resource
 def get_ollama_model():
-    return ChatOllama(model="llava", temperature=0.7)
+    return ChatOllama(model=LOCAL_MODEL, temperature=0.7)

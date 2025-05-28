@@ -3,13 +3,12 @@ from utils.analysis import Analysis
 from utils.model_handler import get_ollama_model
 import streamlit as st
 import os
-from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 from utils.model_handler import HuggingFaceModel
-load_dotenv()
+from utils.config import HUGGINGFACE_API_KEY
 
 
-api_token = None
+api_token = HUGGINGFACE_API_KEY
 model = None
 is_local_model = False
 
@@ -342,7 +341,13 @@ with tab2:
 
             with tags_tab:
                 st.subheader("🔥 Trending Tags / Hashtags")
-                hashtags = " ".join([f"`#{tag}`" for tag in result['tags'].values()])
+                tags_data = result['tags']
+                if isinstance(tags_data, dict):
+                    hashtags = " ".join([f"`#{tag}`" for tag in tags_data.values()])
+                elif isinstance(tags_data, list):
+                    hashtags = " ".join([f"`#{tag}`" for tag in tags_data])
+                else:
+                    hashtags = ""
                 st.markdown(hashtags)
 
             with timestamp_tab:
