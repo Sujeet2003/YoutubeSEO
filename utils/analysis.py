@@ -1,5 +1,6 @@
 from langchain.prompts import PromptTemplate
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+import json
 
 
 class Analysis:
@@ -155,18 +156,22 @@ class Analysis:
             language=language
         )
 
-        response = self.__llm.invoke(formatted_prompt2)
-        print(response)
+        raw_response = self.__llm.invoke(formatted_prompt2)
+
+        if self.__is_local_model:
+            raw_response = raw_response.content
+
+        start = raw_response.find('{')
+        end = raw_response.rfind('}') + 1
+        json_substring = raw_response[start:end]
 
         try:
-            if self.__is_local_model:
-                return parser.parse(response.content)
-            else:
-                return parser.parse(response)
-        except Exception as e:
-            print("Raw response:\n", response)
-            raise ValueError(f"Error parsing response: {e}")
-
+            data = json.loads(json_substring)
+            print(data)
+            return data
+        except json.JSONDecodeError as e:
+            print("Invalid JSON:", e)
+            return "Data not founf in JSON format"
 
 
 # v = VideoExtraction()
